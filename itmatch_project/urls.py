@@ -23,7 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('users/', include('users.urls')),
-    # УДАЛИТЕ ВСЕ ОСТАЛЬНЫЕ path() ДО ТЕХ ПОР, ПОКА НЕ СОЗДАДИТЕ ПРИЛОЖЕНИЯ!
+    path('matches/', include('matches.urls')),
 ]
 
 if settings.DEBUG:

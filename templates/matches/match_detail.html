@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Совпадение с {{ other_user.username }}</h2>
+        <a href="{% url 'matches:matches_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Назад к списку
+        </a>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center">
+                    <div class="mb-3">
+                        <div class="d-inline-block position-relative">
+                            {% if other_user.avatar %}
+                                <img src="{{ other_user.avatar.url }}" 
+                                     class="rounded-circle" width="150" height="150">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                     style="width: 150px; height: 150px;">
+                                    <i class="bi bi-person" style="font-size: 60px; color: #6c757d;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="position-absolute bottom-0 end-0 bg-success rounded-circle border border-white" 
+                                 style="width: 20px; height: 20px;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="compatibility-badge mb-3">
+                        <span class="badge {% if compatibility_score > 70 %}bg-success{% elif compatibility_score > 40 %}bg-warning{% else %}bg-secondary{% endif %} p-2">
+                            Совместимость: {{ compatibility_score }}%
+                        </span>
+                    </div>
+                    
+                    <p class="text-muted">
+                        Совпали: {{ match.created_at|date:"d.m.Y H:i" }}
+                    </p>
+                </div>
+                
+                <div class="col-md-8">
+                    <h3>{{ other_user.get_full_name|default:other_user.username }}</h3>
+                    
+                    <div class="mb-3">
+                        {% if other_user.role %}
+                            <span class="badge bg-primary">{{ other_user.get_role_display }}</span>
+                        {% endif %}
+                        {% if other_user.level %}
+                            <span class="badge bg-info">{{ other_user.get_level_display }}</span>
+                        {% endif %}
+                        {% if other_user.work_mode %}
+                            <span class="badge bg-secondary">{{ other_user.get_work_mode_display }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><i class="bi bi-geo-alt"></i> <strong>Город:</strong> {{ other_user.city|default:"Не указан" }}</p>
+                            <p><i class="bi bi-briefcase"></i> <strong>Опыт:</strong> {{ other_user.experience_years }} лет</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% if other_user.github_profile %}
+                                <p><i class="bi bi-github"></i> <strong>GitHub:</strong> 
+                                    <a href="{{ other_user.github_profile }}" target="_blank">Профиль</a>
+                                </p>
+                            {% endif %}
+                            {% if other_user.telegram %}
+                                <p><i class="bi bi-telegram"></i> <strong>Telegram:</strong> {{ other_user.telegram }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if other_user.bio %}
+                        <div class="mb-3">
+                            <h6>О себе:</h6>
+                            <p>{{ other_user.bio|linebreaks }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if other_user.looking_for %}
+                        <div class="mb-3">
+                            <h6>Ищет на платформе:</h6>
+                            <p>{{ other_user.looking_for }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    {% if other_user.technologies %}
+                        <div class="mb-3">
+                            <h6>Технологии:</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for tech in other_user.get_technologies_list %}
+                                    <span class="badge bg-light text-dark border">{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-4">
+                        <button class="btn btn-primary" onclick="startChat()">
+                            <i class="bi bi-chat-dots"></i> Начать общение
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="unmatch()">
+                            <i class="bi bi-x-circle"></i> Удалить совпадение
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Общие технологии -->
+    {% if request.user.technologies and other_user.technologies %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Общие технологии</h5>
+            </div>
+            <div class="card-body">
+                {% with my_tech=request.user.get_technologies_list other_tech=other_user.get_technologies_list %}
+                    {% with common=my_tech|intersect:other_tech %}
+                        {% if common %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for tech in common %}
+                                    <span class="badge bg-primary p-2">{{ tech }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">Общих технологий не найдено</p>
+                        {% endif %}
+                    {% endwith %}
+                {% endwith %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function startChat() {
+        alert('Чат будет реализован в следующем этапе разработки!');
+    }
+    
+    function unmatch() {
+        if (confirm('Вы уверены что хотите удалить это совпадение?')) {
+            // Здесь будет код для удаления совпадения
+            alert('Совпадение удалено');
+            window.location.href = "{% url 'matches:matches_list' %}";
+        }
+    }
+</script>
+
+<style>
+    .compatibility-badge .badge {
+        font-size: 1.1em;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Отладочная информация</h2>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Отправленные лайки ({{ sent_likes|length }})</h4>
+            <ul>
+                {% for like in sent_likes %}
+                    <li>{{ like.receiver.username }} - {{ like.timestamp|date:"d.m.Y H:i" }}</li>
+                {% empty %}
+                    <li>Нет отправленных лайков</li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div class="col-md-6">
+            <h4>Полученные лайки ({{ received_likes|length }})</h4>
+            <ul>
+                {% for like in received_likes %}
+                    <li>{{ like.sender.username }} - {{ like.timestamp|date:"d.m.Y H:i" }}</li>
+                {% empty %}
+                    <li>Нет полученных лайков</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+    <h4>Совпадения ({{ matches|length }})</h4>
+    <ul>
+        {% for match in matches %}
+            <li>
+                {% if match.user1 == request.user %}
+                    С {{ match.user2.username }}
+                {% else %}
+                    С {{ match.user1.username }}
+                {% endif %}
+                - {{ match.created_at|date:"d.m.Y H:i" }}
+                {% if not match.is_active %}(неактивно){% endif %}
+            </li>
+        {% empty %}
+            <li>Нет совпадений</li>
+        {% endfor %}
+    </ul>
+    
+    <a href="{% url 'matches:feed' %}" class="btn btn-primary">Назад к ленте</a>
+</div>
+{% endblock %}
