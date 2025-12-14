@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Добро пожаловать в ITMatch!</h1>
+<p>Сайт знакомств для IT-специалистов.</p>
+{% if user.is_authenticated %}
+    <p>Вы вошли как {{ user.username }}.</p>
+{% else %}
+    <p>Пожалуйста, войдите или зарегистрируйтесь.</p>
+{% endif %}
+{% endblock %}
