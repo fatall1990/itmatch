@@ -236,23 +236,31 @@
 </div>
 
 <!-- Модальное окно для мэтча -->
-<div class="modal fade" id="matchModal" tabindex="-1">
+<div class="modal fade" id="matchModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">🎉 Взаимная симпатия!</h5>
+            </div>
             <div class="modal-body text-center p-5">
-                <div class="match-hearts mb-3">
-                    <i class="bi bi-heart-fill text-danger" style="font-size: 3rem;"></i>
-                    <i class="bi bi-heart-fill text-danger" style="font-size: 4rem;"></i>
-                    <i class="bi bi-heart-fill text-danger" style="font-size: 3rem;"></i>
+                <div class="match-animation mb-4">
+                    <div class="hearts-container">
+                        <i class="bi bi-heart-fill heart heart-1"></i>
+                        <i class="bi bi-heart-fill heart heart-2"></i>
+                        <i class="bi bi-heart-fill heart heart-3"></i>
+                    </div>
                 </div>
-                <h3 class="mb-3">Это взаимная симпатия!</h3>
+
+                <h3 class="mb-3">Это взаимно!</h3>
                 <p class="mb-4">Вы понравились друг другу. Теперь вы можете общаться!</p>
-                <div class="d-flex gap-3 justify-content-center">
-                    <button class="btn btn-primary" onclick="goToMatches()">
+                <p class="text-muted small mb-4">Автоматический переход через: <span id="countdown">3</span> сек.</p>
+
+                <div class="d-flex flex-column gap-3">
+                    <button class="btn btn-primary btn-lg" onclick="goToMatches()">
                         <i class="bi bi-chat-dots"></i> Перейти к совпадениям
                     </button>
-                    <button class="btn btn-outline-primary" data-bs-dismiss="modal">
-                        Продолжить просмотр
+                    <button class="btn btn-outline-primary" onclick="continueSwiping()">
+                        <i class="bi bi-arrow-right"></i> Продолжить просмотр
                     </button>
                 </div>
             </div>
@@ -326,6 +334,90 @@
         50% { transform: scale(1.2); }
         100% { transform: scale(1); }
     }
+
+    /* Анимации для модального окна */
+    .match-animation {
+        position: relative;
+        height: 100px;
+    }
+
+    .hearts-container {
+        position: relative;
+        width: 200px;
+        height: 100px;
+        margin: 0 auto;
+    }
+
+    .heart {
+        position: absolute;
+        color: #ff6b6b;
+        font-size: 3rem;
+        animation: float 2s ease-in-out infinite;
+    }
+
+    .heart-1 {
+        left: 20%;
+        animation-delay: 0s;
+    }
+
+    .heart-2 {
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 4rem;
+        animation-delay: 0.2s;
+    }
+
+    .heart-3 {
+        right: 20%;
+        animation-delay: 0.4s;
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: translateY(-20px) scale(1.1);
+            opacity: 0.8;
+        }
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+        }
+        70% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 10px rgba(255, 107, 107, 0);
+        }
+        100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(255, 107, 107, 0);
+        }
+    }
+
+    .modal-content {
+        animation: pulse 2s infinite;
+        border: 3px solid #ff6b6b;
+    }
+
+    /* Анимация появления */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal.fade .modal-dialog {
+        animation: fadeIn 0.3s ease-out;
+    }
 </style>
 
 <script>
@@ -346,11 +438,75 @@
         return cookieValue;
     }
 
-    // Отправка лайка
+    // Глобальные переменные для управления модальным окном
+    let countdownInterval;
+    let countdownValue = 60;
+
+    // Обратный отсчет в модальном окне
+    function startCountdown() {
+        countdownValue = 60;
+        const countdownElement = document.getElementById('countdown');
+        if (countdownElement) {
+            countdownElement.textContent = countdownValue;
+        }
+
+        countdownInterval = setInterval(() => {
+            countdownValue--;
+            if (countdownElement) {
+                countdownElement.textContent = countdownValue;
+            }
+
+            if (countdownValue <= 0) {
+                clearInterval(countdownInterval);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('matchModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                // Перезагружаем страницу для показа следующего пользователя
+                setTimeout(() => {
+                    window.location.reload();
+                }, 300);
+            }
+        }, 1000);
+    }
+
+    // Переход к совпадениям
+    function goToMatches() {
+        clearInterval(countdownInterval);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('matchModal'));
+        if (modal) {
+            modal.hide();
+        }
+        setTimeout(() => {
+            window.location.href = "{% url 'matches:matches_list' %}";
+        }, 300);
+    }
+
+    // Продолжить просмотр
+    function continueSwiping() {
+        clearInterval(countdownInterval);
+        const modal = bootstrap.Modal.getInstance(document.getElementById('matchModal'));
+        if (modal) {
+            modal.hide();
+        }
+        // Перезагружаем страницу для показа следующего пользователя
+        setTimeout(() => {
+            window.location.reload();
+        }, 300);
+    }
+
+    // Обновленная функция отправки лайка с улучшенной обработкой модального окна
     function sendLike(userId) {
-        console.log('Sending like to user:', userId);
+        console.log('Отправка лайка пользователю:', userId);
 
         const csrfToken = getCSRFToken();
+
+        // Отключаем кнопки чтобы предотвратить повторные нажатия
+        const likeBtn = document.querySelector('.like-btn');
+        const dislikeBtn = document.querySelector('.dislike-btn');
+        likeBtn.disabled = true;
+        dislikeBtn.disabled = true;
+        likeBtn.innerHTML = '<i class="bi bi-heart-fill"></i>';
 
         fetch(`/matches/like/${userId}/`, {
             method: 'POST',
@@ -358,50 +514,62 @@
                 'X-CSRFToken': csrfToken,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({}),
         })
-        .then(response => {
-            console.log('Response status:', response.status);
-            return response.json().then(data => ({status: response.status, data}));
-        })
-        .then(result => {
-            console.log('Response data:', result);
+        .then(response => response.json())
+        .then(data => {
+            console.log('Ответ сервера:', data);
 
-            if (result.status === 200) {
-                // Анимация лайка
-                const likeBtn = document.querySelector('.like-btn');
-                likeBtn.innerHTML = '<i class="bi bi-heart-fill"></i>';
-                likeBtn.classList.add('disabled');
+            if (data.success) {
+                if (data.has_match) {
+                    console.log('Найдено совпадение!');
 
-                // Проверяем на мэтч
-                if (result.data.has_match) {
-                    console.log('Match found!');
+                    // Показываем модальное окно и запускаем отсчет
+                    const matchModalElement = document.getElementById('matchModal');
+                    const matchModal = new bootstrap.Modal(matchModalElement);
+
+                    // Слушаем событие показа модального окна
+                    matchModalElement.addEventListener('shown.bs.modal', function () {
+                        startCountdown();
+                    });
+
+                    matchModal.show();
+
+                } else {
+                    // Если нет совпадения, перезагружаем через 1 секунду
                     setTimeout(() => {
-                        const matchModal = new bootstrap.Modal(document.getElementById('matchModal'));
-                        matchModal.show();
-                    }, 500);
+                        window.location.reload();
+                    }, 1000);
                 }
-
-                // Загружаем следующего пользователя через 1 секунду
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
             } else {
-                alert(result.data.error || 'Произошла ошибка');
-                console.error('Error response:', result.data);
+                alert(data.error || 'Произошла ошибка');
+                // Включаем кнопки обратно
+                likeBtn.disabled = false;
+                dislikeBtn.disabled = false;
+                likeBtn.innerHTML = '<i class="bi bi-heart"></i>';
             }
         })
         .catch(error => {
-            console.error('Network error:', error);
+            console.error('Ошибка сети:', error);
             alert('Произошла ошибка при отправке лайка');
+            // Включаем кнопки обратно
+            likeBtn.disabled = false;
+            dislikeBtn.disabled = false;
+            likeBtn.innerHTML = '<i class="bi bi-heart"></i>';
         });
     }
 
-    // Отправка дизлайка
+    // Функция отправки дизлайка (оставляем как есть, но улучшаем)
     function sendDislike(userId) {
-        console.log('Sending dislike to user:', userId);
+        console.log('Отправка дизлайка пользователю:', userId);
 
         const csrfToken = getCSRFToken();
+
+        // Отключаем кнопки
+        const likeBtn = document.querySelector('.like-btn');
+        const dislikeBtn = document.querySelector('.dislike-btn');
+        likeBtn.disabled = true;
+        dislikeBtn.disabled = true;
+        dislikeBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
 
         fetch(`/matches/dislike/${userId}/`, {
             method: 'POST',
@@ -409,32 +577,31 @@
                 'X-CSRFToken': csrfToken,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({}),
         })
-        .then(response => {
-            console.log('Dislike response status:', response.status);
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            console.log('Dislike response data:', data);
+            console.log('Ответ дизлайка:', data);
 
             if (data.success) {
-                // Анимация дизлайка
-                const dislikeBtn = document.querySelector('.dislike-btn');
-                dislikeBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
-                dislikeBtn.classList.add('disabled');
-
-                // Загружаем следующего пользователя через 0.5 секунды
+                // Перезагружаем через 0.5 секунды
                 setTimeout(() => {
                     window.location.reload();
                 }, 500);
             } else {
                 alert(data.error || 'Произошла ошибка');
+                // Включаем кнопки обратно
+                likeBtn.disabled = false;
+                dislikeBtn.disabled = false;
+                dislikeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
             }
         })
         .catch(error => {
-            console.error('Network error:', error);
+            console.error('Ошибка сети:', error);
             alert('Произошла ошибка при отправке дизлайка');
+            // Включаем кнопки обратно
+            likeBtn.disabled = false;
+            dislikeBtn.disabled = false;
+            dislikeBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
         });
     }
 </script>
