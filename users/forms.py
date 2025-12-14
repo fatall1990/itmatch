@@ -20,13 +20,22 @@ class UserRegistrationForm(UserCreationForm):
         return user
 
 
-# ТОЛЬКО эти формы - остальное удалите!
 class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = [
+            'first_name', 'last_name', 'email',
+            'role', 'level', 'bio', 'city',
+            'technologies', 'github_profile', 'telegram',
+            'looking_for', 'work_mode', 'experience_years',
+            'avatar'
+        ]
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 4}),
+            'technologies': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Python, Django, JavaScript, React, Docker...'
+            }),
+        }
 
 
-class UserProfileForm(forms.Form):
-    bio = forms.CharField(widget=forms.Textarea, required=False)
-    city = forms.CharField(max_length=100, required=False)

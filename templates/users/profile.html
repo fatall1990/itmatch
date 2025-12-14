@@ -1,21 +1,156 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8 mx-auto">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Профиль пользователя</h2>
-                <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
-                <p><strong>Email:</strong> {{ user.email }}</p>
-                <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
-                
-                <div class="mt-4">
-                    <a href="{% url 'edit_profile' %}" class="btn btn-primary">Редактировать профиль</a>
-                    <a href="{% url 'home' %}" class="btn btn-outline-secondary">На главную</a>
+<div class="container">
+    <div class="row">
+        <!-- Левая колонка - аватар и основная информация -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    {% if user.avatar %}
+                        <img src="{{ user.avatar.url }}" class="rounded-circle mb-3" width="150" height="150">
+                    {% else %}
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                             style="width: 150px; height: 150px;">
+                            <i class="bi bi-person" style="font-size: 60px; color: #6c757d;"></i>
+                        </div>
+                    {% endif %}
+
+                    <h4>{{ user.get_full_name|default:user.username }}</h4>
+
+                    {% if user.role %}
+                        <span class="badge bg-primary mb-2">{{ user.get_role_display }}</span>
+                    {% endif %}
+
+                    {% if user.level %}
+                        <span class="badge bg-info">{{ user.get_level_display }}</span>
+                    {% endif %}
+
+                    {% if user.city %}
+                        <p class="mt-3 mb-1">
+                            <i class="bi bi-geo-alt"></i> {{ user.city }}
+                        </p>
+                    {% endif %}
+
+                    {% if user.experience_years > 0 %}
+                        <p class="mb-1">
+                            <i class="bi bi-briefcase"></i> {{ user.experience_years }} лет опыта
+                        </p>
+                    {% endif %}
+
+                    {% if user.work_mode %}
+                        <p class="mb-1">
+                            <i class="bi bi-laptop"></i> {{ user.get_work_mode_display }}
+                        </p>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{% url 'edit_profile' %}" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Редактировать
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Контакты -->
+            {% if user.github_profile or user.telegram %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Контакты</h5>
+                </div>
+                <div class="card-body">
+                    {% if user.github_profile %}
+                        <p>
+                            <i class="bi bi-github"></i>
+                            <a href="{{ user.github_profile }}" target="_blank">GitHub</a>
+                        </p>
+                    {% endif %}
+
+                    {% if user.telegram %}
+                        <p>
+                            <i class="bi bi-telegram"></i>
+                            {{ user.telegram }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Правая колонка - детальная информация -->
+        <div class="col-md-8">
+            <!-- Технологии -->
+            {% if user.technologies %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Технологии</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for tech in user.get_technologies_list %}
+                            <span class="badge bg-secondary">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- О себе -->
+            {% if user.bio %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">О себе</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ user.bio|linebreaks }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Цели на платформе -->
+            {% if user.looking_for %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Ищу на платформе</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ user.looking_for }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Информация об аккаунте -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Информация об аккаунте</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Имя пользователя:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+                    <p><strong>Последний вход:</strong> {{ user.last_login|date:"d.m.Y H:i"|default:"Еще не входил" }}</p>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .badge {
+        font-size: 0.9em;
+        padding: 0.5em 0.8em;
+    }
+
+    .card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 1rem 1.25rem;
+    }
+</style>
 {% endblock %}

@@ -1,15 +1,130 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-body">
-                <h2 class="card-title mb-4">Редактирование профиля</h2>
-                <p>Функция редактирования профиля будет доступна позже.</p>
-                <a href="{% url 'home' %}" class="btn btn-primary">Вернуться на главную</a>
-            </div>
+<div class="container">
+    <h2 class="mb-4">Редактирование IT-профиля</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="row">
+                    <!-- Основная информация -->
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Основная информация</h4>
+
+                        <div class="mb-3">
+                            <label class="form-label">Имя</label>
+                            {{ form.first_name }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Фамилия</label>
+                            {{ form.last_name }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Город</label>
+                            {{ form.city }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Аватар</label>
+                            {{ form.avatar }}
+                        </div>
+                    </div>
+
+                    <!-- IT-информация -->
+                    <div class="col-md-6">
+                        <h4 class="mb-3">IT-профиль</h4>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Роль</label>
+                                {{ form.role }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Уровень</label>
+                                {{ form.level }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Опыт работы (лет)</label>
+                            {{ form.experience_years }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Формат работы</label>
+                            {{ form.work_mode }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Технологии</label>
+                            {{ form.technologies }}
+                            <small class="text-muted">Перечислите через запятую: Python, Django, React и т.д.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">GitHub профиль</label>
+                            {{ form.github_profile }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Telegram</label>
+                            {{ form.telegram }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- О себе и цели -->
+                <div class="row mt-3">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">О себе</label>
+                        {{ form.bio }}
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Ищу на платформе</label>
+                        {{ form.looking_for }}
+                        <small class="text-muted">Например: друзей, проекты, ментора, работу</small>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    <a href="{% url 'profile' %}" class="btn btn-outline-secondary">Отмена</a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<style>
+    /* Добавим стили для форм */
+    input, select, textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    label {
+        font-weight: 500;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+    }
+</style>
 {% endblock %}

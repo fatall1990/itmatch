@@ -1,11 +1,99 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Добро пожаловать в ITMatch!</h1>
-<p>Сайт знакомств для IT-специалистов.</p>
-{% if user.is_authenticated %}
-    <p>Вы вошли как {{ user.username }}.</p>
-{% else %}
-    <p>Пожалуйста, войдите или зарегистрируйтесь.</p>
-{% endif %}
+<div class="container">
+    <!-- Hero секция -->
+    <div class="hero-section p-5 mb-5 rounded-3 text-white"
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">ITMatch</h1>
+                <h2 class="mb-4">Знакомства для разработчиков</h2>
+                <p class="lead mb-4">Находите единомышленников по технологическому стеку. Общайтесь, делитесь опытом, создавайте проекты вместе.</p>
+
+                {% if not user.is_authenticated %}
+                <div class="d-flex gap-3">
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Начать бесплатно
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Войти
+                    </a>
+                </div>
+                {% else %}
+                <div class="alert alert-light">
+                    <h4>Добро пожаловать, {{ user.username }}!</h4>
+                    <p>Ваш профиль:
+                        {% if user.role %}
+                            {{ user.get_role_display }}
+                            {% if user.level %}({{ user.get_level_display }}){% endif %}
+                        {% else %}
+                            Заполните IT-профиль чтобы найти подходящих разработчиков
+                        {% endif %}
+                    </p>
+                    <div class="mt-3">
+                        <a href="{% url 'profile' %}" class="btn btn-primary me-2">Мой профиль</a>
+                        <a href="{% url 'edit_profile' %}" class="btn btn-outline-light">Редактировать</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Как это работает -->
+    <div class="row text-center mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="p-4">
+                <i class="bi bi-code-slash display-4 text-primary mb-3"></i>
+                <h4>Укажите стек</h4>
+                <p>Выберите ваши технологии: Python, JavaScript, React, Docker и другие</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="p-4">
+                <i class="bi bi-search-heart display-4 text-primary mb-3"></i>
+                <h4>Находите match</h4>
+                <p>Алгоритм подбирает людей по совпадению технологий и интересов</p>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="p-4">
+                <i class="bi bi-chat-dots display-4 text-primary mb-3"></i>
+                <h4>Общайтесь в IT-сообществе</h4>
+                <p>Обсуждайте проекты, ищите коллаборации и делитесь опытом</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Популярные технологии -->
+    <div class="card mb-5">
+        <div class="card-body">
+            <h3 class="mb-4">Популярные технологии на платформе</h3>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-primary p-2">Python</span>
+                <span class="badge bg-primary p-2">JavaScript</span>
+                <span class="badge bg-primary p-2">React</span>
+                <span class="badge bg-primary p-2">Django</span>
+                <span class="badge bg-primary p-2">TypeScript</span>
+                <span class="badge bg-primary p-2">Docker</span>
+                <span class="badge bg-primary p-2">PostgreSQL</span>
+                <span class="badge bg-primary p-2">AWS</span>
+                <span class="badge bg-primary p-2">Vue.js</span>
+                <span class="badge bg-primary p-2">FastAPI</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hero-section {
+        margin-top: 20px;
+    }
+
+    .badge {
+        font-size: 1em;
+        padding: 0.6em 1em;
+    }
+</style>
 {% endblock %}
